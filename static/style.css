@@ -1,0 +1,157 @@
+body { 
+    font-family: Arial, sans-serif; 
+    max-width: 800px; 
+    margin: 0 auto; 
+    padding: 20px; 
+}
+
+h1 {
+    text-align: center;
+    color: #007cba;
+}
+
+.form-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.container { 
+    background: #fffbfb; 
+    padding: 20px; 
+    border-radius: 8px; 
+}
+
+input[type="url"] { 
+    width: 60%; 
+    padding: 10px; 
+    margin-right: 10px; 
+}
+
+button { 
+    padding: 10px 20px; 
+    background: #007cba; 
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+}
+
+button:hover { 
+    background: #005a87; 
+}
+
+.result { 
+    margin-top: 20px; 
+    padding: 15px; 
+    background: white; 
+    border-radius: 5px; 
+}
+
+.error { 
+    background: #ffebee; 
+    color: #c62828; 
+}
+
+.success { 
+    background: #e8f5e8; 
+    color: #2e7d32; 
+}
+
+.jobs-table { 
+    margin-top: 30px; 
+}
+
+.jobs-table h2 {
+    text-align: center;
+    color: #007cba;
+    margin-bottom: 20px;
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 10px; 
+}
+
+th, td { 
+    padding: 10px; 
+    text-align: left; 
+    border-bottom: 1px solid #ddd; 
+}
+
+th { 
+    background-color: #f2f2f2; 
+}
+
+tr:hover { 
+    background-color: #f5f5f5; 
+}
+
+.delete-btn { 
+    background: transparent; 
+    color: #dc3545; 
+    border: none; 
+    padding: 5px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    width: 20px; 
+    height: 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.delete-btn:hover { 
+    background: #f8f9fa; 
+    color: #c82333; 
+}
+
+.expand-btn { 
+    background: transparent; 
+    color: #666; 
+    border: none; 
+    padding: 5px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    width: 20px; 
+    height: 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.expand-btn:hover { 
+    background: #f0f0f0; 
+}
+
+.job-details { 
+    display: none; 
+    background: #f8f9fa; 
+    padding: 15px; 
+    border-top: 1px solid #dee2e6; 
+}
+
+.job-details h4 { 
+    margin: 0 0 10px 0; 
+    color: #495057; 
+}
+
+.job-details p { 
+    margin: 5px 0; 
+}
+
+.view-btn {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+
+.view-btn:hover {
+    background: #005a87;
+}

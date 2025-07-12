@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Posting Analyzer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Job Posting Analyzer</h1>
+        <div class="form-container">
+            <input type="url" id="urlInput" placeholder="Enter job posting URL..." />
+            <button onclick="analyzeJob()">Analyze</button>
+        </div>
+        <div id="result"></div>
+        
+        <div class="jobs-table">
+            <h2>All Jobs in Database</h2>
+            <table id="jobsTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Company</th>
+                        <th>Job Title</th>
+                        <th>Location</th>
+                        <th>Date Added</th>
+                        <th>URL</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="jobsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

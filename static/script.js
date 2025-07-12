@@ -1,0 +1,134 @@
+async function loadJobs() {
+    try {
+        const response = await fetch('/jobs');
+        const data = await response.json();
+        const tbody = document.getElementById('jobsTableBody');
+        
+        tbody.innerHTML = '';
+        
+        data.jobs.forEach((job, index) => {
+            const row = document.createElement('tr');
+            row.title = job.job_summary || 'No summary available';
+            row.innerHTML = `
+                <td><button class="expand-btn" onclick="toggleJobDetails(${index})">▶</button></td>
+                <td>${job.company_name || 'N/A'}</td>
+                <td>${job.job_title || 'N/A'}</td>
+                <td>${job.location || 'N/A'}</td>
+                <td>${job.date_added || 'N/A'}</td>
+                <td><button class="view-btn" onclick="window.open('${job.url}', '_blank')">View</button></td>
+                <td>
+                    <button class="delete-btn" onclick="deleteJob('${job.url}')">✗</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            
+            // Add details row
+            const detailsRow = document.createElement('tr');
+            detailsRow.innerHTML = `
+                <td colspan="7">
+                    <div class="job-details" id="details-${index}">
+                        <h4>Job Details:</h4>
+                        <p><strong>Company:</strong> ${job.company_name || 'N/A'}</p>
+                        <p><strong>Job Title:</strong> ${job.job_title || 'N/A'}</p>
+                        <p><strong>Location:</strong> ${job.location || 'N/A'}</p>
+                        <p><strong>URL:</strong> <a href="${job.url}" target="_blank">${job.url}</a></p>
+                        <p><strong>Date Added:</strong> ${job.date_added || 'N/A'}</p>
+                        <p><strong>Summary:</strong> ${job.job_summary || 'No summary available'}</p>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(detailsRow);
+        });
+    } catch (error) {
+        console.error('Error loading jobs:', error);
+    }
+}
+
+// Load jobs when page loads
+window.addEventListener('load', loadJobs);
+
+function toggleJobDetails(index) {
+    const detailsDiv = document.getElementById(`details-${index}`);
+    const button = event.target;
+    
+    if (detailsDiv.style.display === 'block') {
+        detailsDiv.style.display = 'none';
+        button.textContent = '▶';
+    } else {
+        detailsDiv.style.display = 'block';
+        button.textContent = '▼';
+    }
+}
+
+async function deleteJob(jobUrl) {
+    if (confirm('Are you sure you want to delete this job?')) {
+        try {
+            console.log('Deleting job with URL:', jobUrl);
+            const response = await fetch('/jobs', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ job_id: jobUrl })
+            });
+            
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Response data:', data);
+            
+            if (data.success) {
+                console.log('Job deleted successfully, refreshing table');
+                loadJobs(); // Refresh the table
+            } else {
+                alert('Error deleting job: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error deleting job:', error);
+            alert('Error deleting job: ' + error.message);
+        }
+    }
+}
+
+async function analyzeJob() {
+    const url = document.getElementById('urlInput').value;
+    const resultDiv = document.getElementById('result');
+    
+    if (!url) {
+        resultDiv.innerHTML = '<div class="result error">Please enter a URL</div>';
+        return;
+    }
+    
+    resultDiv.innerHTML = '<div class="result">Analyzing...</div>';
+    
+    try {
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="result success">
+                    <h3>Job Analysis Results:</h3>
+                    <p><strong>Company:</strong> ${data.data.company_name}</p>
+                    <p><strong>Job Title:</strong> ${data.data.job_title}</p>
+                    <p><strong>Location:</strong> ${data.data.location}</p>
+                    <p><strong>URL:</strong> ${data.data.url}</p>
+                    <p><strong>Date Added:</strong> ${data.data.date_added}</p>
+                    <p><strong>Summary:</strong> ${data.data.job_summary}</p>
+                </div>
+            `;
+            // Refresh the jobs table
+            loadJobs();
+        } else {
+            resultDiv.innerHTML = `<div class="result error">Error: ${data.error}</div>`;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+    }
+}
