@@ -38,6 +38,10 @@ class URLRequest(BaseModel):
 class DeleteRequest(BaseModel):
     job_id: str
 
+class PriorityRequest(BaseModel):
+    job_id: str
+    priority: int
+
 def save_job_data(job_data):
     """Save job data to local text file database"""
     filename = "jobs_database.txt"
@@ -95,6 +99,34 @@ def delete_job(job_url):
             f.writelines(filtered_lines)
         
         return deleted
+    except FileNotFoundError:
+        return False
+
+def update_job_priority(job_url, new_priority):
+    """Update the priority of a job in the database using URL as primary key"""
+    filename = "jobs_database.txt"
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        updated = False
+        new_lines = []
+        for line in lines:
+            if line.strip():
+                bracket_end = line.find('] ')
+                if bracket_end != -1:
+                    json_part = line[bracket_end + 2:].strip()
+                    try:
+                        job_data = json.loads(json_part)
+                        if job_data.get("url") == job_url:
+                            job_data["priority"] = new_priority
+                            line = line[:bracket_end+2] + json.dumps(job_data) + "\n"
+                            updated = True
+                    except json.JSONDecodeError:
+                        pass
+            new_lines.append(line)
+        with open(filename, "w", encoding="utf-8") as f:
+            f.writelines(new_lines)
+        return updated
     except FileNotFoundError:
         return False
 
@@ -182,6 +214,7 @@ Return only valid JSON, no other text."""
                 job_data = json.loads(content)
                 job_data["url"] = url
                 job_data["date_added"] = datetime.now().strftime("%Y-%m-%d")
+                job_data["priority"] = 5
                 logger.info(f"Successfully analyzed job: {job_data.get('company_name', 'N/A')} - {job_data.get('job_title', 'N/A')}")
                 return job_data
             except json.JSONDecodeError:
@@ -217,6 +250,15 @@ async def delete_job_endpoint(request: DeleteRequest):
         return {"success": True, "message": "Job deleted successfully"}
     else:
         return {"success": False, "error": "Job not found or could not be deleted"}
+
+@app.patch("/jobs")
+async def update_priority_endpoint(request: PriorityRequest):
+    """Update job priority in the database"""
+    success = update_job_priority(request.job_id, request.priority)
+    if success:
+        return {"success": True, "message": "Priority updated successfully"}
+    else:
+        return {"success": False, "error": "Job not found or could not update priority"}
 
 @app.post("/analyze")
 async def analyze_job(request: URLRequest):

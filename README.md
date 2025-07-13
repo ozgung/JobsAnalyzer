@@ -85,6 +85,7 @@ A web application that analyzes job postings using AI and stores them in a local
 - `POST /analyze` - Analyze a job posting URL
 - `GET /jobs` - Get all jobs from database
 - `DELETE /jobs` - Delete a job by URL
+- `PATCH /jobs` - Update a job's priority (0-5)
 
 ## Requirements
 
@@ -94,13 +95,14 @@ A web application that analyzes job postings using AI and stores them in a local
 - Requests
 - BeautifulSoup4
 - Python-dotenv
+- Jinja2
 - Anthropic API key
 
 ## Database Format
 
 Jobs are stored in `jobs_database.txt` with the following format:
 ```
-[YYYY-MM-DD HH:MM:SS] {"company_name": "...", "job_title": "...", "location": "...", "url": "...", "date_added": "YYYY-MM-DD", "job_summary": "..."}
+[YYYY-MM-DD HH:MM:SS] {"company_name": "...", "job_title": "...", "location": "...", "url": "...", "date_added": "YYYY-MM-DD", "job_summary": "...", "priority": 0-5}
 ```
 
 ## Note

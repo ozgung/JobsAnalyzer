@@ -9,11 +9,22 @@ async function loadJobs() {
         data.jobs.forEach((job, index) => {
             const row = document.createElement('tr');
             row.title = job.job_summary || 'No summary available';
+            const currentPriority = job.priority !== undefined ? job.priority : 5;
             row.innerHTML = `
                 <td><button class="expand-btn" onclick="toggleJobDetails(${index})">▶</button></td>
                 <td>${job.company_name || 'N/A'}</td>
                 <td>${job.job_title || 'N/A'}</td>
                 <td>${job.location || 'N/A'}</td>
+                <td>
+                    <select class="priority-select" onchange="updatePriority('${job.url}', this.value)">
+                        <option value="0"${currentPriority == 0 ? ' selected' : ''}>0</option>
+                        <option value="1"${currentPriority == 1 ? ' selected' : ''}>1</option>
+                        <option value="2"${currentPriority == 2 ? ' selected' : ''}>2</option>
+                        <option value="3"${currentPriority == 3 ? ' selected' : ''}>3</option>
+                        <option value="4"${currentPriority == 4 ? ' selected' : ''}>4</option>
+                        <option value="5"${currentPriority == 5 ? ' selected' : ''}>5</option>
+                    </select>
+                </td>
                 <td>${job.date_added || 'N/A'}</td>
                 <td><button class="view-btn" onclick="window.open('${job.url}', '_blank')">View</button></td>
                 <td>
@@ -25,7 +36,7 @@ async function loadJobs() {
             // Add details row
             const detailsRow = document.createElement('tr');
             detailsRow.innerHTML = `
-                <td colspan="7">
+                <td colspan="8">
                     <div class="job-details" id="details-${index}">
                         <h4>Job Details:</h4>
                         <p><strong>Company:</strong> ${job.company_name || 'N/A'}</p>
@@ -130,5 +141,23 @@ async function analyzeJob() {
         }
     } catch (error) {
         resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+    }
+}
+
+// Update priority for a job
+async function updatePriority(jobUrl, priority) {
+    try {
+        const response = await fetch('/jobs', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ job_id: jobUrl, priority: parseInt(priority, 10) })
+        });
+        const data = await response.json();
+        if (!data.success) {
+            alert('Failed to update priority: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error updating priority:', error);
+        alert('Error updating priority: ' + error.message);
     }
 }
