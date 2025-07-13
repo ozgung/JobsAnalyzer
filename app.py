@@ -229,10 +229,13 @@ Return only valid JSON, no other text."""
         return {"error": f"Request failed: {str(e)}"}
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root():
-    from fastapi import Request
-    request = Request(scope={"type": "http", "method": "GET"})
-    return templates.TemplateResponse("index.html", {"request": request})
+async def read_root(request: Request):
+    """Render the main interface with cache-busting timestamp."""
+    ts = int(datetime.now().timestamp())
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "ts": ts}
+    )
 
 @app.get("/jobs")
 async def get_jobs():
