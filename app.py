@@ -180,6 +180,7 @@ Extract and return ONLY a JSON object with these fields:
 - job_title: The job title/position
 - location: The job location
 - job_summary: A brief 2-3 sentence summary of the job
+- technologies: A list of key technologies or skills mentioned in the posting (e.g., Python, React, AWS)
 
 Return only valid JSON, no other text."""
     
@@ -215,6 +216,8 @@ Return only valid JSON, no other text."""
                 job_data["url"] = url
                 job_data["date_added"] = datetime.now().strftime("%Y-%m-%d")
                 job_data["priority"] = 5
+                # Ensure technologies list
+                job_data.setdefault("technologies", [])
                 logger.info(f"Successfully analyzed job: {job_data.get('company_name', 'N/A')} - {job_data.get('job_title', 'N/A')}")
                 return job_data
             except json.JSONDecodeError:

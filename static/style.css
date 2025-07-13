@@ -156,6 +156,17 @@ tr:hover {
     background: #005a87;
 }
 
+/* Technology labels in detail view */
+.tech-label {
+    display: inline-block;
+    background: #e0f0ff;
+    color: #007cba;
+    padding: 2px 6px;
+    margin: 2px 4px 2px 0;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
 /* Sortable headers */
 th.sortable {
     cursor: pointer;

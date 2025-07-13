@@ -54,6 +54,11 @@ function renderJobs(jobs) {
                     <p><strong>URL:</strong> <a href="${job.url}" target="_blank">${job.url}</a></p>
                     <p><strong>Date Added:</strong> ${job.date_added || 'N/A'}</p>
                     <p><strong>Summary:</strong> ${job.job_summary || 'No summary available'}</p>
+                    <p><strong>Technologies:</strong> ${
+                        (job.technologies || []).map(tech =>
+                            `<span class="tech-label">${tech}</span>`
+                        ).join('')
+                    }</p>
                 </div>
             </td>
         `;
