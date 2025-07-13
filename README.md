@@ -1,6 +1,6 @@
 # JobsAnalyzer
 
-*This project was written by [Claude Code](https://claude.ai/code)*
+*This project was written by [Claude Code](https://claude.ai/code) and ChatGPT*
 
 A web application that analyzes job postings using AI and stores them in a local database. Built with FastAPI, it scrapes job posting URLs, uses Claude AI to extract key information, and provides a clean interface to view and manage job listings.
 
