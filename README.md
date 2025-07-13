@@ -102,7 +102,7 @@ A web application that analyzes job postings using AI and stores them in a local
 
 Jobs are stored in `jobs_database.txt` with the following format:
 ```
-[YYYY-MM-DD HH:MM:SS] {"company_name": "...", "job_title": "...", "location": "...", "url": "...", "date_added": "YYYY-MM-DD", "job_summary": "...", "priority": 0-5}
+[YYYY-MM-DD HH:MM:SS] {"company_name": "...", "job_title": "...", "location": "...", "url": "...", "date_added": "YYYY-MM-DD", "job_summary": "...", "technologies": ["..."], "priority": 0-5}
 ```
 
 ## Note
