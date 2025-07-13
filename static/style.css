@@ -155,3 +155,12 @@ tr:hover {
 .view-btn:hover {
     background: #005a87;
 }
+
+/* Sortable headers */
+th.sortable {
+    cursor: pointer;
+    color: #007cba;
+}
+th.sortable:hover {
+    text-decoration: underline;
+}

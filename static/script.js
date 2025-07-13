@@ -1,62 +1,90 @@
+// Data store and sort state
+let jobsData = [];
+const sortState = { priority: 'asc', date: 'asc' };
+
 async function loadJobs() {
     try {
         const response = await fetch('/jobs');
         const data = await response.json();
-        const tbody = document.getElementById('jobsTableBody');
-        
-        tbody.innerHTML = '';
-        
-        data.jobs.forEach((job, index) => {
-            const row = document.createElement('tr');
-            row.title = job.job_summary || 'No summary available';
-            const currentPriority = job.priority !== undefined ? job.priority : 5;
-            row.innerHTML = `
-                <td><button class="expand-btn" onclick="toggleJobDetails(${index})">▶</button></td>
-                <td>${job.company_name || 'N/A'}</td>
-                <td>${job.job_title || 'N/A'}</td>
-                <td>${job.location || 'N/A'}</td>
-                <td>
-                    <select class="priority-select" onchange="updatePriority('${job.url}', this.value)">
-                        <option value="0"${currentPriority == 0 ? ' selected' : ''}>0</option>
-                        <option value="1"${currentPriority == 1 ? ' selected' : ''}>1</option>
-                        <option value="2"${currentPriority == 2 ? ' selected' : ''}>2</option>
-                        <option value="3"${currentPriority == 3 ? ' selected' : ''}>3</option>
-                        <option value="4"${currentPriority == 4 ? ' selected' : ''}>4</option>
-                        <option value="5"${currentPriority == 5 ? ' selected' : ''}>5</option>
-                    </select>
-                </td>
-                <td>${job.date_added || 'N/A'}</td>
-                <td><button class="view-btn" onclick="window.open('${job.url}', '_blank')">View</button></td>
-                <td>
-                    <button class="delete-btn" onclick="deleteJob('${job.url}')">✗</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-            
-            // Add details row
-            const detailsRow = document.createElement('tr');
-            detailsRow.innerHTML = `
-                <td colspan="8">
-                    <div class="job-details" id="details-${index}">
-                        <h4>Job Details:</h4>
-                        <p><strong>Company:</strong> ${job.company_name || 'N/A'}</p>
-                        <p><strong>Job Title:</strong> ${job.job_title || 'N/A'}</p>
-                        <p><strong>Location:</strong> ${job.location || 'N/A'}</p>
-                        <p><strong>URL:</strong> <a href="${job.url}" target="_blank">${job.url}</a></p>
-                        <p><strong>Date Added:</strong> ${job.date_added || 'N/A'}</p>
-                        <p><strong>Summary:</strong> ${job.job_summary || 'No summary available'}</p>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(detailsRow);
-        });
+        jobsData = data.jobs;
+        renderJobs(jobsData);
     } catch (error) {
         console.error('Error loading jobs:', error);
     }
 }
 
+function renderJobs(jobs) {
+    const tbody = document.getElementById('jobsTableBody');
+    tbody.innerHTML = '';
+    jobs.forEach((job, index) => {
+        const row = document.createElement('tr');
+        row.title = job.job_summary || 'No summary available';
+        const currentPriority = job.priority !== undefined ? job.priority : 5;
+        row.innerHTML = `
+            <td><button class="expand-btn" onclick="toggleJobDetails(${index})">▶</button></td>
+            <td>${job.company_name || 'N/A'}</td>
+            <td>${job.job_title || 'N/A'}</td>
+            <td>${job.location || 'N/A'}</td>
+            <td>
+                <select class="priority-select" onchange="updatePriority('${job.url}', this.value)">
+                    <option value="0"${currentPriority == 0 ? ' selected' : ''}>0</option>
+                    <option value="1"${currentPriority == 1 ? ' selected' : ''}>1</option>
+                    <option value="2"${currentPriority == 2 ? ' selected' : ''}>2</option>
+                    <option value="3"${currentPriority == 3 ? ' selected' : ''}>3</option>
+                    <option value="4"${currentPriority == 4 ? ' selected' : ''}>4</option>
+                    <option value="5"${currentPriority == 5 ? ' selected' : ''}>5</option>
+                </select>
+            </td>
+            <td>${job.date_added || 'N/A'}</td>
+            <td><button class="view-btn" onclick="window.open('${job.url}', '_blank')">View</button></td>
+            <td>
+                <button class="delete-btn" onclick="deleteJob('${job.url}')">✗</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        // details row
+        const detailsRow = document.createElement('tr');
+        detailsRow.innerHTML = `
+            <td colspan="8">
+                <div class="job-details" id="details-${index}">
+                    <h4>Job Details:</h4>
+                    <p><strong>Company:</strong> ${job.company_name || 'N/A'}</p>
+                    <p><strong>Job Title:</strong> ${job.job_title || 'N/A'}</p>
+                    <p><strong>Location:</strong> ${job.location || 'N/A'}</p>
+                    <p><strong>URL:</strong> <a href="${job.url}" target="_blank">${job.url}</a></p>
+                    <p><strong>Date Added:</strong> ${job.date_added || 'N/A'}</p>
+                    <p><strong>Summary:</strong> ${job.job_summary || 'No summary available'}</p>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(detailsRow);
+    });
+}
+
 // Load jobs when page loads
 window.addEventListener('load', loadJobs);
+
+// Sorting handlers
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('sort-priority').addEventListener('click', () => {
+        sortState.priority = sortState.priority === 'asc' ? 'desc' : 'asc';
+        const sorted = [...jobsData].sort((a, b) =>
+            sortState.priority === 'asc'
+                ? a.priority - b.priority
+                : b.priority - a.priority
+        );
+        renderJobs(sorted);
+    });
+    document.getElementById('sort-date').addEventListener('click', () => {
+        sortState.date = sortState.date === 'asc' ? 'desc' : 'asc';
+        const sorted = [...jobsData].sort((a, b) => {
+            const da = new Date(a.date_added);
+            const db = new Date(b.date_added);
+            return sortState.date === 'asc' ? da - db : db - da;
+        });
+        renderJobs(sorted);
+    });
+});
 
 function toggleJobDetails(index) {
     const detailsDiv = document.getElementById(`details-${index}`);
