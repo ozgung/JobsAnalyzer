@@ -1,6 +1,6 @@
 body { 
     font-family: Arial, sans-serif; 
-    max-width: 800px; 
+    max-width: 1000px; 
     margin: 0 auto; 
     padding: 20px; 
 }
@@ -160,7 +160,8 @@ tr:hover {
 th.sortable {
     cursor: pointer;
     color: #007cba;
+    text-decoration: underline;
 }
 th.sortable:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
