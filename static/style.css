@@ -16,7 +16,7 @@ h1 {
 }
 
 .container { 
-    background: #fffbfb; 
+    background: #fdfdfd; 
     padding: 20px; 
     border-radius: 8px; 
 }
@@ -164,4 +164,9 @@ th.sortable {
 }
 th.sortable:hover {
     text-decoration: none;
+}
+
+/* Prevent header text from wrapping */
+th {
+    white-space: nowrap;
 }
