@@ -7,32 +7,37 @@
 </head>
 <body>
     <div class="container">
-        <div class="model-selector">
-            <div id="modelToggle" class="model-display">Claude (Anthropic) &#9662;</div>
-            <div id="modelMenu" class="model-menu" style="display: none;">
-                <div class="model-item" data-model="anthropic">
-                    <span class="check-icon">✓</span> Claude (Anthropic)
-                </div>
-                <div class="model-item" data-model="openai">
-                    <span class="check-icon"></span> OpenAI GPT-3.5 Turbo
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: flex-start; margin-bottom: 20px;">
+            <div class="model-selector">
+                <div id="modelToggle" class="model-display">Claude (Anthropic) &#9662;</div>
+                <div id="modelMenu" class="model-menu" style="display: none;">
+                    <div class="model-item" data-model="anthropic">
+                        <span class="check-icon">✓</span> Claude (Anthropic)
+                    </div>
+                    <div class="model-item" data-model="openai">
+                        <span class="check-icon"></span> OpenAI GPT-3.5 Turbo
+                    </div>
                 </div>
             </div>
-        </div>
-        <h1>AI Job Tracker</h1>
-        <div class="model-selector about-selector">
-            <div id="aboutToggle" class="model-display">About &#9662;</div>
-            <div id="aboutMenu" class="model-menu" style="display: none;">
-                <div class="about-item">
-                    <div class="about-content">
-                        <h3>Getting Started</h3>
-                        <p>Enter a job posting URL above and click <strong>Analyze</strong>. Use the Technologies filter to view jobs by specific skills, and expand rows for details.</p>
-                        <p>Made by Claude Code and OpenAI Codex</p>
-                        <p>Human: Ozgun Genc</p>
-                        <p><a href="https://github.com/ozgung/JobsAnalyzer" target="_blank">https://github.com/ozgung/JobsAnalyzer</a></p>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <img src="/static/aijob-logo.png" alt="AI Job Tracker Logo" class="logo" style="width: 200px;"/>
+            </div>
+            <div class="model-selector about-selector" style="position: relative; top: auto; right: auto; justify-self: end;">
+                <div id="aboutToggle" class="model-display">About &#9662;</div>
+                <div id="aboutMenu" class="model-menu" style="display: none;">
+                    <div class="about-item">
+                        <div class="about-content">
+                            <h3>AI Job Tracker</h3>
+                            <p>Enter a job posting URL above and click <strong>Analyze</strong>. Use the Technologies filter to view jobs by specific skills, and expand rows for details.</p>
+                            <p>Made by Claude Code and OpenAI Codex</p>
+                            <p>Human: Ozgun Genc</p>
+                            <p><a href="https://github.com/ozgung/JobsAnalyzer" target="_blank">https://github.com/ozgung/JobsAnalyzer</a></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- <h1>AI Job Tracker</h1> -->
         <div class="form-container">
             <input type="url" id="urlInput" placeholder="Enter job posting URL..." />
             <button onclick="analyzeJob()">Analyze</button>

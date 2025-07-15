@@ -1,8 +1,16 @@
 # JobsAnalyzer
 
-*This project was written by [Claude Code](https://claude.ai/code) and [Codex by OpenAI](https://openai.com/codex/)
+<div align="center">
+<img src="static/aijob-logo.png" alt="JobsAnalyzer Logo" width="200">
+<br><br>
+
+*This project was written by [Claude Code](https://claude.ai/code), [Codex by OpenAI](https://openai.com/codex/), and [GitHub Copilot](https://github.com/features/copilot)*
+
 
 A web application that analyzes job postings using AI and stores them in a local database. Built with FastAPI, it scrapes job posting URLs, uses Claude AI or OpenAI GPT to extract key information, and provides a clean interface to view and manage job listings.
+
+<img src="static/aijob-ss%20Medium.png" alt="JobsAnalyzer Main Page" width="600">
+</div>
 
 ## Features
 
