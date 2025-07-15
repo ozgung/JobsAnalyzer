@@ -1,12 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Job Posting Analyzer</title>
+    <title>AI Job Tracker</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4////fwAJ/wP+qiV5TQAAAABJRU5ErkJggg==">
 </head>
 <body>
     <div class="container">
-        <h1>Job Posting Analyzer</h1>
+        <div class="model-selector">
+            <div id="modelToggle" class="model-display">Claude (Anthropic) &#9662;</div>
+            <div id="modelMenu" class="model-menu" style="display: none;">
+                <div class="model-item" data-model="anthropic">
+                    <span class="check-icon">✓</span> Claude (Anthropic)
+                </div>
+                <div class="model-item" data-model="openai">
+                    <span class="check-icon"></span> OpenAI GPT-3.5 Turbo
+                </div>
+            </div>
+        </div>
+        <h1>AI Job Tracker</h1>
+        <div class="model-selector about-selector">
+            <div id="aboutToggle" class="model-display">About &#9662;</div>
+            <div id="aboutMenu" class="model-menu" style="display: none;">
+                <div class="about-item">
+                    <div class="about-content">
+                        <h3>Getting Started</h3>
+                        <p>Enter a job posting URL above and click <strong>Analyze</strong>. Use the Technologies filter to view jobs by specific skills, and expand rows for details.</p>
+                        <p>Made by Claude Code and OpenAI Codex</p>
+                        <p>Human: Ozgun Genc</p>
+                        <p><a href="https://github.com/ozgung/JobsAnalyzer" target="_blank">https://github.com/ozgung/JobsAnalyzer</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-container">
             <input type="url" id="urlInput" placeholder="Enter job posting URL..." />
             <button onclick="analyzeJob()">Analyze</button>
@@ -14,7 +40,11 @@
         <div id="result"></div>
         
         <div class="jobs-table">
-            <h2>All Jobs in Database</h2>
+            <h2>All Jobs</h2>
+            <div id="techFilter" class="tech-filter">
+                <div id="toggleTechs" class="toggle-tech-labels collapsed">Technologies</div>
+                <div id="techList" class="tech-list"></div>
+            </div>
             <table id="jobsTable">
                 <thead>
                     <tr>

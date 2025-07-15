@@ -2,18 +2,20 @@
 
 *This project was written by [Claude Code](https://claude.ai/code) and [Codex by OpenAI](https://openai.com/codex/)
 
-A web application that analyzes job postings using AI and stores them in a local database. Built with FastAPI, it scrapes job posting URLs, uses Claude AI to extract key information, and provides a clean interface to view and manage job listings.
+A web application that analyzes job postings using AI and stores them in a local database. Built with FastAPI, it scrapes job posting URLs, uses Claude AI or OpenAI GPT to extract key information, and provides a clean interface to view and manage job listings.
 
 ## Features
 
-- **AI-powered Analysis**: Uses Claude AI to extract company name, job title, location, and summary from job postings
+- **AI-powered Analysis**: Uses Claude AI or OpenAI GPT to extract company name, job title, location, and summary from job postings
 - **Web Scraping**: Automatically scrapes job posting content from URLs
 - **Local Database**: Stores job data in a simple text file database
 - **Web Interface**: Clean, responsive UI for analyzing and viewing jobs
 - **Duplicate Prevention**: Prevents adding the same job URL twice
 - **Expandable Rows**: Click to expand job details and view full summaries
 - **Delete Functionality**: Remove jobs from the database with confirmation
-- **Hover Tooltips**: Quick summary preview on row hover
+ - **Hover Tooltips**: Quick summary preview on row hover
+- **Sidebar Technology List**: Displays all unique technology labels from your stored jobs
+- **Clickable Tech Labels**: Click a technology in the filter panel to filter the job list by that technology (click "All" to reset filter). Use the toggle arrow to hide/show the tech filter panel (appears between heading and table). The table heading will update to show the selected technology (e.g. "Python jobs").
 
 ## Installation
 
@@ -38,9 +40,10 @@ A web application that analyzes job postings using AI and stores them in a local
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and add your Anthropic API key:
+   Edit `.env` and add your Anthropic and OpenAI API keys:
    ```
    ANTHROPIC_API_KEY=your_anthropic_api_key_here
+   OPENAI_API_KEY=your_openai_api_key_here
    ```
 
 5. Get your Anthropic API key from: https://console.anthropic.com/
@@ -86,6 +89,7 @@ A web application that analyzes job postings using AI and stores them in a local
 - `GET /jobs` - Get all jobs from database
 - `DELETE /jobs` - Delete a job by URL
 - `PATCH /jobs` - Update a job's priority (0-5)
+- `GET /techs` - Retrieve all unique technology labels and their counts
 
 ## Requirements
 
@@ -97,6 +101,7 @@ A web application that analyzes job postings using AI and stores them in a local
 - Python-dotenv
 - Jinja2
 - Anthropic API key
+- OpenAI API key
 
 ## Database Format
 

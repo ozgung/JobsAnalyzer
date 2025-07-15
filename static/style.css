@@ -15,10 +15,11 @@ h1 {
     margin-bottom: 20px;
 }
 
-.container { 
-    background: #fdfdfd; 
-    padding: 20px; 
-    border-radius: 8px; 
+.container {
+    background: #fdfdfd;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
 }
 
 input[type="url"] { 
@@ -28,15 +29,16 @@ input[type="url"] {
 }
 
 button { 
-    padding: 10px 20px; 
+    padding: 12px 20px; 
     background: #1a3ab7; 
     color: white; 
-    border: none; 
+    border: none;
+    border-radius: 3px; 
     cursor: pointer; 
 }
 
 button:hover { 
-    background: #005a87; 
+    background: #4459af; 
 }
 
 .result { 
@@ -153,7 +155,7 @@ tr:hover {
 }
 
 .view-btn:hover {
-    background: #005a87;
+    background: #4459af;
 }
 
 /* Technology labels in detail view */
@@ -165,6 +167,12 @@ tr:hover {
     margin: 2px 4px 2px 0;
     border-radius: 4px;
     font-size: 0.9em;
+    cursor: pointer;
+}
+/* Active / selected tech filter */
+.tech-label.active {
+    background: #cce5ff;
+    color: #004085;
 }
 
 /* Sortable headers */
@@ -180,4 +188,102 @@ th.sortable:hover {
 /* Prevent header text from wrapping */
 th {
     white-space: nowrap;
+}
+
+/* Model selector styles */
+.model-selector {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+.model-display {
+    cursor: pointer;
+    padding: 4px 8px;
+    /* border: 1px solid #ccc;
+    border-radius: 4px; */
+    background: white;
+    display: inline-block;
+    color:#495057;
+}
+.model-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    z-index: 1000;
+    color:#495057;
+}
+.model-item {
+    cursor: pointer;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+}
+.model-item:hover {
+    background: #f0f0f0;
+}
+.check-icon {
+    display: inline-block;
+    width: 1em;
+    margin-right: 6px;
+}
+
+/* About selector adjustments */
+.about-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+.about-selector .model-menu {
+    left: auto;
+    right: 0;
+}
+.about-selector .about-item {
+    cursor: default;
+    padding: 8px;
+    white-space: normal;
+    line-height: 1.4;
+    min-width: 200px;
+}
+
+/* Center and constrain the about panel text */
+.about-selector .about-content {
+    text-align: center;
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+/* Sidebar layout */
+/* Toggleable technology filter above the table */
+.toggle-tech-labels {
+    cursor: pointer;
+    color: #1a3ab7;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.toggle-tech-labels.collapsed + .tech-list {
+    display: none;
+}
+.toggle-tech-labels:after {
+    content: ' ▼';
+}
+.toggle-tech-labels.collapsed:after {
+    content: ' ▶';
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar li {
+    padding: 4px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.9em;
+}
+.sidebar li:last-child {
+    border-bottom: none;
 }

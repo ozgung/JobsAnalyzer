@@ -1,5 +1,10 @@
 // Data store and sort state
 let jobsData = [];
+// Data store for technology labels and current filter
+let techsData = {};
+let currentFilterTech = null;
+// Track currently selected AI model ("anthropic" or "openai")
+let currentModel = 'anthropic';
 const sortState = { priority: 'asc', date: 'asc' };
 
 async function loadJobs() {
@@ -7,9 +12,71 @@ async function loadJobs() {
         const response = await fetch('/jobs');
         const data = await response.json();
         jobsData = data.jobs;
-        renderJobs(jobsData);
+        renderJobs(applyTechFilter(jobsData));
     } catch (error) {
         console.error('Error loading jobs:', error);
+    }
+}
+
+// Load technology labels and render sidebar list
+// Load and render technology labels in sidebar
+async function loadTechs() {
+    try {
+        const response = await fetch('/techs');
+        const data = await response.json();
+        techsData = data.techs;
+        renderTechs();
+    } catch (error) {
+        console.error('Error loading technologies:', error);
+    }
+}
+
+function renderTechs() {
+    const container = document.getElementById('techList');
+    if (!container) return;
+    container.innerHTML = '';
+    // 'All' option to clear filter
+    const allSpan = document.createElement('span');
+    allSpan.className = 'tech-label' + (currentFilterTech === null ? ' active' : '');
+    allSpan.textContent = 'All';
+    allSpan.addEventListener('click', () => {
+        currentFilterTech = null;
+        renderTechs();
+        renderJobs(applyTechFilter(jobsData));
+    });
+    container.appendChild(allSpan);
+    // Individual tech labels
+    Object.keys(techsData).sort().forEach(tech => {
+        const span = document.createElement('span');
+        span.className = 'tech-label' + (tech === currentFilterTech ? ' active' : '');
+        span.textContent = tech;
+        span.addEventListener('click', () => {
+            currentFilterTech = tech;
+            renderTechs();
+            renderJobs(applyTechFilter(jobsData));
+        });
+        container.appendChild(span);
+    });
+    // Update table heading based on selected tech
+    updateHeading();
+}
+
+// Apply current technology filter to jobs list
+function applyTechFilter(list) {
+    if (!currentFilterTech) return list;
+    return list.filter(job => (job.technologies || []).includes(currentFilterTech));
+}
+
+/**
+ * Update the jobs table heading to reflect the current tech filter.
+ */
+function updateHeading() {
+    const heading = document.querySelector('.jobs-table h2');
+    if (!heading) return;
+    if (currentFilterTech) {
+        heading.innerHTML = `<span class="tech-label active">${currentFilterTech}</span> jobs`;
+    } else {
+        heading.textContent = 'All Jobs';
     }
 }
 
@@ -66,8 +133,11 @@ function renderJobs(jobs) {
     });
 }
 
-// Load jobs when page loads
-window.addEventListener('load', loadJobs);
+// Load jobs and technologies when page loads
+window.addEventListener('load', () => {
+    loadJobs();
+    loadTechs();
+});
 
 // Sorting handlers
 document.addEventListener('DOMContentLoaded', () => {
@@ -78,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? a.priority - b.priority
                 : b.priority - a.priority
         );
-        renderJobs(sorted);
+        renderJobs(applyTechFilter(sorted));
     });
     document.getElementById('sort-date').addEventListener('click', () => {
         sortState.date = sortState.date === 'asc' ? 'desc' : 'asc';
@@ -87,8 +157,51 @@ document.addEventListener('DOMContentLoaded', () => {
             const db = new Date(b.date_added);
             return sortState.date === 'asc' ? da - db : db - da;
         });
-        renderJobs(sorted);
+        renderJobs(applyTechFilter(sorted));
     });
+    // Toggle model selection menu
+    const modelToggle = document.getElementById('modelToggle');
+    const modelMenu = document.getElementById('modelMenu');
+    modelToggle.addEventListener('click', () => {
+        modelMenu.style.display = modelMenu.style.display === 'block' ? 'none' : 'block';
+    });
+    // Handle model choice clicks
+    const modelItems = document.querySelectorAll('.model-item');
+    // initialize from global default
+    currentModel = 'anthropic';
+    const modelNames = {
+        anthropic: 'Claude (Anthropic)',
+        openai: 'OpenAI GPT-3.5 Turbo'
+    };
+    function updateModelSelection(selected) {
+        currentModel = selected;
+        modelToggle.textContent = modelNames[selected] + ' ▼';
+        modelItems.forEach(item => {
+            const check = item.querySelector('.check-icon');
+            check.textContent = item.dataset.model === selected ? '✓' : '';
+        });
+        modelMenu.style.display = 'none';
+    }
+    modelItems.forEach(item => {
+        item.addEventListener('click', () => updateModelSelection(item.dataset.model));
+    });
+    // Toggle technology filter visibility
+    const toggleBtn = document.getElementById('toggleTechs');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            toggleBtn.classList.toggle('collapsed');
+        });
+    }
+    // Toggle About menu visibility (styled like model selector)
+    const aboutToggle = document.getElementById('aboutToggle');
+    const aboutMenu = document.getElementById('aboutMenu');
+    if (aboutToggle && aboutMenu) {
+        aboutToggle.addEventListener('click', () => {
+            const isOpen = aboutMenu.style.display === 'block';
+            aboutMenu.style.display = isOpen ? 'none' : 'block';
+            aboutToggle.innerHTML = 'About &#9662;';
+        });
+    }
 });
 
 function toggleJobDetails(index) {
@@ -122,7 +235,8 @@ async function deleteJob(jobUrl) {
             
             if (data.success) {
                 console.log('Job deleted successfully, refreshing table');
-                loadJobs(); // Refresh the table
+                loadJobs();     // Refresh the job table
+                loadTechs();    // Refresh the sidebar tech list
             } else {
                 alert('Error deleting job: ' + data.error);
             }
@@ -143,6 +257,7 @@ async function analyzeJob() {
     }
     
     resultDiv.innerHTML = '<div class="result">Analyzing...</div>';
+    const selectedModel = currentModel;
     
     try {
         const response = await fetch('/analyze', {
@@ -150,7 +265,7 @@ async function analyzeJob() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ url: url })
+            body: JSON.stringify({ url: url, model: selectedModel })
         });
         
         const data = await response.json();
@@ -169,6 +284,7 @@ async function analyzeJob() {
             `;
             // Refresh the jobs table
             loadJobs();
+            loadTechs();
         } else {
             resultDiv.innerHTML = `<div class="result error">Error: ${data.error}</div>`;
         }

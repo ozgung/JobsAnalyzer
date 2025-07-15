@@ -10,6 +10,8 @@ import logging
 from datetime import datetime
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
+from typing import Optional
+import openai
 
 load_dotenv()
 
@@ -34,6 +36,7 @@ templates = Jinja2Templates(directory="templates")
 
 class URLRequest(BaseModel):
     url: str
+    model: Optional[str] = "anthropic"
 
 class DeleteRequest(BaseModel):
     job_id: str
@@ -130,9 +133,56 @@ def update_job_priority(job_url, new_priority):
     except FileNotFoundError:
         return False
 
-def analyze_job_posting(url):
-    """Scrape job posting and use Claude API to analyze the content"""
-    logger.info(f"Starting analysis for URL: {url}")
+def analyze_job_posting(url, model: str = "anthropic"):
+    """Scrape job posting content and analyze using the selected AI model"""
+    logger.info(f"Starting analysis for URL: {url} using model: {model}")
+    if model == "openai":
+        openai.api_key = os.getenv("OPENAI_API_KEY") or ""
+        if not openai.api_key:
+            logger.error("OPENAI_API_KEY not set")
+            return {"error": "OPENAI_API_KEY not set"}
+        try:
+            resp = requests.get(
+                url,
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            )
+            if resp.status_code != 200:
+                logger.error(f"Failed to fetch URL {url}: {resp.status_code}")
+                return {"error": f"Failed to fetch URL: {resp.status_code}"}
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            for script in soup(["script", "style"]):
+                script.decompose()
+            raw_text = soup.get_text()
+            lines = (line.strip() for line in raw_text.splitlines())
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            text_content = ' '.join(chunk for chunk in chunks if chunk)
+            if len(text_content) > 8000:
+                text_content = text_content[:8000]
+        except Exception as e:
+            logger.error(f"Failed to scrape URL {url}: {str(e)}")
+            return {"error": f"Failed to scrape URL: {str(e)}"}
+        prompt = f"""Please analyze this job posting content and extract the following information:\n\nContent: {text_content}\n\nExtract and return ONLY a JSON object with these fields:\n- company_name: The name of the company\n- job_title: The job title/position\n- location: The job location\n- job_summary: A brief 2-3 sentence summary of the job\n- technologies: A list of key technologies or skills mentioned in the posting (e.g., Python, React, AWS)\n\nReturn only valid JSON, no other text."""
+        try:
+            ai_resp = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=1000
+            )
+            content = ai_resp.choices[0].message.content
+        except Exception as e:
+            logger.error(f"OpenAI request failed: {str(e)}")
+            return {"error": f"OpenAI request failed: {str(e)}"}
+        try:
+            job_data = json.loads(content)
+            job_data["url"] = url
+            job_data["date_added"] = datetime.now().strftime("%Y-%m-%d")
+            job_data["priority"] = 5
+            job_data.setdefault("technologies", [])
+            logger.info(f"Successfully analyzed job: {job_data.get('company_name', 'N/A')} - {job_data.get('job_title', 'N/A')}")
+            return job_data
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse OpenAI response as JSON: {content}")
+            return {"error": "Failed to parse OpenAI response as JSON"}
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
         logger.error("ANTHROPIC_API_KEY not set")
@@ -278,7 +328,7 @@ async def analyze_job(request: URLRequest):
             return {"success": False, "error": "Job URL already exists in database"}
     
     # Analyze the job posting
-    job_data = analyze_job_posting(request.url)
+    job_data = analyze_job_posting(request.url, request.model)
     
     if "error" not in job_data:
         # Save to database
@@ -286,6 +336,17 @@ async def analyze_job(request: URLRequest):
         return {"success": True, "data": job_data}
     else:
         return {"success": False, "error": job_data["error"]}
+
+
+@app.get("/techs")
+async def get_techs():
+    """Get all unique technology labels from the database."""
+    jobs = get_all_jobs()
+    techs = {}
+    for job in jobs:
+        for tech in job.get("technologies", []):
+            techs[tech] = techs.get(tech, 0) + 1
+    return {"techs": techs}
 
 if __name__ == "__main__":
     import uvicorn
