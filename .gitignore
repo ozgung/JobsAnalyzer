@@ -3,6 +3,7 @@
 
 # Database files
 jobs_database.txt
+*.backup
 
 # Python
 __pycache__/
